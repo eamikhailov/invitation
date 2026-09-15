@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>У меня есть план ✈️</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Caveat:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <canvas id="confetti"></canvas>
+
+    <main class="app" id="app">
+      <nav class="route" id="route" aria-label="Страницы">
+        <span class="route-plane" id="routePlane">
+          <svg viewBox="0 0 24 24"><use href="#planeIcon" /></svg>
+        </span>
+      </nav>
+
+      <svg width="0" height="0" style="position: absolute">
+        <defs>
+          <path
+            id="planeIcon"
+            d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"
+          />
+        </defs>
+      </svg>
+
+      <!-- 0. Карта с полётом -->
+      <section class="screen active" id="s-map">
+        <p class="kicker"><span data-name></span>, у меня есть план</p>
+        <div class="map-card" id="mapCard">
+          <svg id="mapSvg" preserveAspectRatio="xMidYMid slice">
+            <image href="assets/world-loc.svg" width="800" height="400" />
+            <defs>
+              <mask id="trailMask">
+                <path id="trailReveal" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" />
+              </mask>
+            </defs>
+            <path id="trail" fill="none" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="2.4 2" stroke-linecap="round" mask="url(#trailMask)" />
+            <g id="pinFrom" class="pin">
+              <circle r="2.4" fill="#0b3d91" stroke="#fff" stroke-width="1" />
+              <text id="pinFromLabel" y="-5" text-anchor="middle"></text>
+            </g>
+            <g id="plane"><use href="#planeIcon" transform="translate(-6 -6) scale(0.5)" fill="#1f2430" /></g>
+          </svg>
+          <span class="sticker sticker-route" id="routeSticker"></span>
+        </div>
+        <p class="muted" id="mapHint">Нажми на карту</p>
+
+        <!-- Появляется под картой после полёта -->
+        <div class="question" id="question" hidden>
+          <h1><span data-name></span>, полетели в&nbsp;Корею?</h1>
+          <p class="muted" id="whenLine"></p>
+          <div class="btn-row" id="btnRow">
+            <button class="btn btn-primary" id="yesBtn">Да!</button>
+            <span class="no-slot" id="noSlot"><button class="btn btn-no" id="noBtn">Нет</button></span>
+          </div>
+          <p class="hint" id="noHint"></p>
+        </div>
+      </section>
+
+      <!-- Сюда script.js вставляет фото-страницы из config.stories -->
+
+      <!-- Карусель мест -->
+      <section class="screen" id="s-places">
+        <p class="kicker">같이 가자! — «Поехали вместе!»</p>
+        <h2>Пройдёмся и по Сеулу?</h2>
+        <div class="wall" id="placeCards"></div>
+        <div class="choice">
+          <button class="btn btn-primary" data-next>Да</button>
+          <button class="btn btn-no phantom" data-bite="1">Нет</button>
+        </div>
+      </section>
+
+      <!-- Выбор занятий -->
+      <section class="screen" id="s-chips">
+        <h2>Что обязательно сделаем?</h2>
+        <p class="muted">Выбирай сколько хочешь, я запомню</p>
+        <div class="chips" id="chips"></div>
+        <label class="wish">
+          <span>Или своё желание:</span>
+          <input id="wishInput" type="text" maxlength="80" placeholder="например, увидеть рассвет на Чеджу" />
+        </label>
+        <button class="btn btn-primary wide" id="toTicket" disabled>Готово</button>
+      </section>
+
+      <!-- Финал: концерт Ado -->
+      <section class="screen" id="s-ticket">
+        <p class="kicker">🎤 И в один из вечеров</p>
+        <h2>Сходим на концерт Ado?</h2>
+        <p class="story-text">
+          3 октября Ado закрывает первый день фестиваля XMF в Paradise City — он стоит прямо у аэропорта Инчхон.
+          Это твой выходной, если что. Да и билеты я уже взял.
+        </p>
+        <div class="ticket concert" id="ticket">
+          <div class="ticket-head">
+            <span>XMF 2026 · Xnterstellar Music Festival</span>
+            <span>DAY 1</span>
+          </div>
+          <div class="concert-main">
+            <div class="concert-artist">ADO</div>
+            <div class="concert-sub">HEADLINER · закрывает вечер</div>
+            <div class="concert-when">
+              <span>3 октября 2026</span>
+              <span>·</span>
+              <span>Paradise City, Инчхон</span>
+            </div>
+          </div>
+          <div class="ticket-stub">
+            <div class="barcode"></div>
+            <small id="tWishes"></small>
+          </div>
+          <div class="stamp" id="stamp">ПРИНЯТО</div>
+        </div>
+        <div class="choice">
+          <button class="btn btn-primary" data-next>Да</button>
+          <button class="btn btn-no phantom" data-no='["Точно?","Это же Ado!","Ладно, идём"]'>Нет</button>
+        </div>
+        <p class="muted small">P.S. 3 октября в Корее ещё и праздник — День основания государства. Отличный день, чтобы прилететь 🙂</p>
+      </section>
+
+      <!-- Финал: настоящий выбор -->
+      <section class="screen" id="s-final">
+        <p class="kicker">✈️ Без фокусов</p>
+        <h2>Ну что, летим в Корею?</h2>
+        <p class="story-text">
+          Тут обе кнопки настоящие: не убегают и не скрываются.<br />Выбор за тобой.
+        </p>
+        <div class="final-choice" id="finalChoice">
+          <button class="btn btn-primary" id="finalYes">Да, летим ✈️</button>
+          <button class="btn btn-ghost" id="finalNo">Нет, не в этот раз</button>
+        </div>
+        <div class="result" id="result" hidden>
+          <p class="result-text" id="resultText"></p>
+          <p class="hint" id="sendHint"></p>
+          <button class="btn btn-ghost wide" id="icsBtn" hidden>Добавить в календарь 📅</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="secrets.js"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,1251 @@
+:root {
+  --paper: #f3ebdc;
+  --paper-2: #fbf7ee;
+  --ink: #1f2430;
+  --muted: #7a7266;
+  --red: #c8102e;
+  --blue: #0b3d91;
+  --gold: #d9a441;
+  --line: #e1d7c3;
+  --radius: 18px;
+  --shadow: 0 10px 26px rgba(43, 37, 30, 0.14);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: "Manrope", system-ui, sans-serif;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--paper);
+  overflow-x: hidden;
+}
+
+/* Бумажная текстура */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.22;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.3 0 0 0 0 0.2 0 0 0 0.5 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+#confetti {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.app {
+  max-width: 480px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 22px 20px calc(28px + env(safe-area-inset-bottom));
+  position: relative;
+  z-index: 1;
+  touch-action: pan-y;
+}
+
+/* ---------- Маршрут-прогресс ---------- */
+.route {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 26px;
+  margin: 0 8px 18px;
+}
+.route::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 50%;
+  border-top: 2px dashed var(--line);
+}
+.route i {
+  position: relative;
+  z-index: 1;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--line);
+  transition: all 0.3s;
+}
+.route i.visited {
+  border-color: var(--red);
+  cursor: pointer;
+}
+.route i.on {
+  background: var(--red);
+  border-color: var(--red);
+}
+.route i.visited::after {
+  content: "";
+  position: absolute;
+  inset: -12px -6px;
+}
+.route-plane {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  transition: left 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+.route-plane svg {
+  width: 100%;
+  height: 100%;
+  fill: var(--blue);
+  transform: rotate(90deg);
+  filter: drop-shadow(0 1px 0 var(--paper));
+}
+
+/* ---------- Экраны ---------- */
+.screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  min-height: calc(100dvh - 120px);
+  justify-content: center;
+}
+.screen.active {
+  display: flex;
+}
+.screen.active.slide-fwd {
+  animation: slide-fwd 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.screen.active.slide-back {
+  animation: slide-back 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes slide-fwd {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+}
+@keyframes slide-back {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+}
+
+h1,
+h2 {
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+h1 {
+  font-size: clamp(1.7rem, 7.5vw, 2.3rem);
+}
+h2 {
+  font-size: clamp(1.35rem, 6vw, 1.75rem);
+}
+
+.kicker {
+  font-family: "Caveat", cursive;
+  font-weight: 700;
+  font-size: 1.35rem;
+  color: var(--red);
+}
+.muted {
+  color: var(--muted);
+}
+.small {
+  font-size: 0.85rem;
+}
+.hint {
+  min-height: 1.4em;
+  font-family: "Caveat", cursive;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--blue);
+}
+
+.big-emoji {
+  font-size: 4.5rem;
+}
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* ---------- Наклейки ---------- */
+.sticker {
+  display: inline-block;
+  font-family: "Caveat", cursive;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 4px 12px;
+  background: #fff;
+  color: var(--blue);
+  border: 1.5px solid var(--blue);
+  border-radius: 6px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  transform: rotate(-4deg);
+  letter-spacing: 0.04em;
+}
+
+/* ---------- Карта ---------- */
+#s-map {
+  justify-content: flex-start;
+  padding-top: 8vh;
+}
+.question {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  margin-top: 10px;
+  animation: slide-up 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.question[hidden] {
+  display: none;
+}
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+.map-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #d8e8f3;
+  box-shadow: var(--shadow);
+  border: 6px solid #fff;
+  cursor: pointer;
+}
+.map-card svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.pin text {
+  font-family: "Caveat", cursive;
+  font-weight: 700;
+  font-size: 9px;
+  fill: var(--ink);
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-width: 2.5px;
+  stroke-linejoin: round;
+}
+.sticker-route {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  transform: rotate(-5deg);
+}
+.map-card.flying .sticker-route {
+  animation: wiggle 0.8s ease-in-out;
+}
+@keyframes wiggle {
+  30% {
+    transform: rotate(3deg);
+  }
+  60% {
+    transform: rotate(-7deg);
+  }
+}
+
+/* ---------- Кнопки ---------- */
+.btn {
+  font: 800 1.05rem "Manrope", sans-serif;
+  border: 0;
+  border-radius: 14px;
+  padding: 15px 28px;
+  cursor: pointer;
+  transition:
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.25s,
+    opacity 0.2s;
+  touch-action: manipulation;
+}
+.btn:active {
+  transform: scale(0.96);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.btn-primary {
+  background: var(--red);
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(200, 16, 46, 0.28);
+}
+.btn-no {
+  background: #fff;
+  color: var(--ink);
+  border: 1.5px solid var(--line);
+  white-space: nowrap;
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--blue);
+  border: 2px solid var(--blue);
+}
+.wide {
+  width: 100%;
+}
+.choice {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+.choice .btn-primary {
+  flex: 1;
+}
+.phantom {
+  padding-left: 18px;
+  padding-right: 18px;
+  white-space: nowrap;
+}
+.ghost {
+  flex: none;
+  display: inline-block;
+  visibility: hidden;
+}
+.phantom.gaveup {
+  flex: 1;
+  animation: pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+  min-height: 80px;
+}
+.btn-row.swapped {
+  flex-direction: row-reverse;
+}
+.no-slot {
+  display: inline-block;
+  min-width: 96px;
+  position: relative;
+}
+.no-slot .tag {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: "Caveat", cursive;
+  font-size: 1.05rem;
+  color: var(--muted);
+}
+.fleeing {
+  position: fixed;
+  z-index: 40;
+  transform: rotate(var(--tilt, 0deg));
+  box-shadow: 0 10px 24px rgba(31, 36, 48, 0.18);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s;
+}
+.fleeing.dash {
+  transition:
+    left 0.45s cubic-bezier(0.3, 0, 0.2, 1),
+    top 0.45s cubic-bezier(0.3, 0, 0.2, 1),
+    transform 0.3s ease;
+}
+.phantom .l {
+  display: inline-block;
+  position: relative;
+  z-index: 45;
+  will-change: transform;
+}
+/* разлёт — быстро, с перелётом */
+.phantom.scattered .l {
+  transition: transform 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.15);
+}
+/* возвращение — медленно */
+.phantom.returning .l {
+  transition: transform 1.5s cubic-bezier(0.45, 0, 0.2, 1);
+}
+.phantom.scattered,
+.phantom.returning {
+  transition: background 0.3s, border-color 0.3s;
+  background: #f7f2ea;
+  border-style: dashed;
+}
+/* Зомби */
+.zombie {
+  position: fixed;
+  z-index: 40;
+  transform: rotate(var(--lurch, 0deg));
+  transition:
+    left 0.42s cubic-bezier(0.35, 0, 0.65, 1),
+    top 0.42s cubic-bezier(0.35, 0, 0.65, 1),
+    transform 0.42s cubic-bezier(0.35, 0, 0.65, 1);
+}
+.zombie.hunting {
+  background: #e6efe0;
+  border-color: #7a9a6a;
+  color: #3d5a34;
+  box-shadow: 0 8px 20px rgba(61, 90, 52, 0.25);
+}
+.zombie:not(.hunting) {
+  animation: sway 1.6s ease-in-out infinite;
+}
+@keyframes sway {
+  50% {
+    transform: rotate(var(--lurch, 0deg)) translateY(-3px);
+  }
+}
+.zombie.bitten {
+  animation: bite 0.9s ease both;
+}
+@keyframes bite {
+  0%,
+  100% {
+    transform: scale(1) rotate(0);
+  }
+  15% {
+    background: var(--red);
+    color: #fff;
+    border-color: var(--red);
+    transform: scale(1.35) rotate(-6deg);
+  }
+  35% {
+    transform: scale(0.9) rotate(5deg);
+  }
+  55% {
+    background: var(--red);
+    color: #fff;
+    transform: scale(1.15) rotate(-3deg);
+  }
+}
+
+/* Море: кнопка тонет */
+.sea {
+  --depth: 0;
+  position: relative;
+  display: inline-flex;
+  border-radius: 14px;
+  overflow: hidden;
+  isolation: isolate;
+}
+.sea .btn {
+  transform: translateY(calc(var(--depth) * 58px)) rotate(calc(var(--depth) * -8deg));
+  filter: saturate(calc(1 - var(--depth) * 0.6)) brightness(calc(1 - var(--depth) * 0.25));
+  transition:
+    transform 0.3s cubic-bezier(0.3, 0, 0.3, 1),
+    filter 0.3s;
+}
+/* вода: поднимается снизу, с волной по верхнему краю */
+.sea::before {
+  content: "";
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: 0;
+  height: calc(var(--depth) * 115%);
+  background: linear-gradient(rgba(31, 111, 255, 0.55), rgba(11, 61, 145, 0.85));
+  border-radius: 45% 55% 0 0 / 14px 10px 0 0;
+  transition: height 0.3s cubic-bezier(0.3, 0, 0.3, 1);
+  animation: wave 1.8s ease-in-out infinite;
+  z-index: 2;
+  pointer-events: none;
+}
+@keyframes wave {
+  50% {
+    border-radius: 55% 45% 0 0 / 10px 14px 0 0;
+    transform: translateX(3px);
+  }
+}
+/* подпись «буль», когда совсем под водой */
+.sea::after {
+  content: "буль…";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: "Caveat", cursive;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 3;
+  pointer-events: none;
+}
+.sea.under::after {
+  opacity: 1;
+}
+.bubble {
+  position: absolute;
+  bottom: 6px;
+  width: var(--s, 6px);
+  height: var(--s, 6px);
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  z-index: 3;
+  pointer-events: none;
+  animation: bubble 1.3s ease-out forwards;
+}
+@keyframes bubble {
+  to {
+    transform: translateY(-64px) translateX(4px);
+    opacity: 0;
+  }
+}
+/* Откусывают */
+.bitten {
+  transition: transform 0.15s;
+}
+.bitten.chomp {
+  animation: chomp 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes chomp {
+  30% {
+    transform: scale(0.88) rotate(-4deg);
+  }
+  60% {
+    transform: scale(1.06) rotate(3deg);
+  }
+}
+.eaten {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  font-size: 1.6rem;
+  cursor: default;
+  transition: all 0.4s;
+}
+.yum {
+  position: fixed;
+  z-index: 60;
+  font-family: "Caveat", cursive;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--red);
+  transform: translate(-50%, 0);
+  animation: yum 0.9s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes yum {
+  to {
+    transform: translate(-50%, -34px) rotate(-8deg);
+    opacity: 0;
+  }
+}
+.crumb {
+  position: fixed;
+  z-index: 60;
+  width: 5px;
+  height: 5px;
+  border-radius: 40%;
+  background: #e1d7c3;
+  border: 1px solid #b9ad95;
+  animation: crumb 0.8s cubic-bezier(0.3, 0, 0.7, 1) forwards;
+  pointer-events: none;
+}
+@keyframes crumb {
+  to {
+    transform: translate(var(--dx), var(--dy)) rotate(200deg);
+    opacity: 0;
+  }
+}
+.shrinking {
+  transform-origin: center;
+  transition: transform 0.12s ease-out;
+}
+.dodging,
+.btn-no.tiny {
+  position: fixed;
+  z-index: 40;
+  transition:
+    left 0.25s ease,
+    top 0.25s ease,
+    transform 0.3s;
+}
+.btn-no.tiny {
+  transform: scale(0.42);
+  transform-origin: center;
+}
+.btn.bounce {
+  animation: bounce 0.5s;
+}
+@keyframes bounce {
+  40% {
+    transform: translateY(-10px) scale(1.06);
+  }
+}
+.yes-clone {
+  position: fixed;
+  z-index: 39;
+  animation: pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes pop {
+  from {
+    transform: scale(0) rotate(-20deg);
+    opacity: 0;
+  }
+}
+.fly-plane {
+  position: fixed;
+  z-index: 41;
+  font-size: 2rem;
+  transition: transform 1.3s cubic-bezier(0.5, 0, 0.9, 0.4);
+  pointer-events: none;
+}
+.btn-no.flying {
+  transition: transform 1.3s cubic-bezier(0.5, 0, 0.9, 0.4) !important;
+}
+
+/* ---------- Фото-страницы ---------- */
+.screen.story {
+  justify-content: flex-start;
+  gap: 12px;
+}
+.polaroid-main {
+  position: relative;
+  width: 92%;
+  padding: 8px 8px 0;
+  background: #fff;
+  box-shadow: var(--shadow);
+  margin: 8px 0 12px;
+}
+.polaroid-main .frame {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #ece6d8;
+}
+.polaroid-main .frame > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.polaroid-main figcaption {
+  font-family: "Caveat", cursive;
+  font-weight: 700;
+  font-size: 1.35rem;
+  line-height: 1.1;
+  color: var(--ink);
+  padding: 8px 6px 8px;
+  text-align: left;
+}
+.polaroid-main.has-polaroid figcaption {
+  padding-right: 46%;
+}
+.polaroid-main figcaption .credit {
+  display: block;
+  margin-top: 4px;
+  font-family: "Manrope", sans-serif;
+  font-weight: 500;
+  font-size: 0.58rem;
+  line-height: 1.3;
+  color: var(--muted);
+}
+.polaroid-main figcaption .credit a {
+  color: inherit;
+}
+.polaroid {
+  position: absolute;
+  right: -16px;
+  bottom: 8px;
+  width: 44%;
+  padding: 6px 6px 22px;
+  background: #fff;
+  box-shadow: 0 10px 22px rgba(43, 37, 30, 0.3);
+  transform: rotate(7deg);
+  animation: polaroid-in 0.7s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  z-index: 2;
+}
+.polaroid img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+}
+.polaroid span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 3px;
+  text-align: center;
+  font-family: "Caveat", cursive;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+@keyframes polaroid-in {
+  from {
+    opacity: 0;
+    transform: rotate(-10deg) translateY(30px) scale(0.6);
+  }
+}
+/* Дополнительные полароиды, торчат из-под основного */
+.extra {
+  position: absolute;
+  width: 36%;
+  padding: 5px 5px 20px;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(43, 37, 30, 0.28);
+  z-index: 1;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), z-index 0s 0.1s;
+  animation: polaroid-in 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.extra img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+}
+.extra span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 2px;
+  text-align: center;
+  font-family: "Caveat", cursive;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.extra-1 {
+  left: -28px;
+  top: 34%;
+  transform: rotate(-9deg);
+  animation-delay: 0.25s;
+}
+.extra-2 {
+  right: -22px;
+  top: -20px;
+  transform: rotate(8deg);
+  animation-delay: 0.4s;
+}
+.extra:hover {
+  transform: rotate(0deg) scale(1.9);
+  z-index: 5;
+}
+.polaroid-main:hover .extra:not(:hover),
+.polaroid-main:hover .polaroid:not(:hover) {
+  opacity: 0.95;
+}
+.polaroid:hover {
+  transform: rotate(0deg) scale(1.6);
+  z-index: 5;
+}
+.polaroid {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.story-text {
+  line-height: 1.5;
+  max-width: 34ch;
+}
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+.facts span {
+  background: var(--paper-2);
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-weight: 700;
+  font-size: 0.86rem;
+}
+
+/* ---------- Стена с фото (Сеул) ---------- */
+.wall {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 26px 22px;
+  padding: 18px 0 10px;
+  width: 100%;
+}
+.card {
+  position: relative;
+  width: 44%;
+  max-width: 230px;
+  padding: 8px 8px 12px;
+  background: #fff;
+  box-shadow: var(--shadow);
+  text-align: left;
+  color: var(--ink);
+  transform: rotate(var(--r, 0deg));
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.35s,
+    z-index 0s;
+  cursor: zoom-in;
+}
+/* полоска скотча сверху */
+.card::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 64px;
+  height: 20px;
+  transform: translateX(-50%) rotate(var(--tape, -3deg));
+  background: rgba(255, 228, 140, 0.75);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  z-index: 2;
+}
+.card:nth-child(1) { --r: -3deg; --tape: 4deg; }
+.card:nth-child(2) { --r: 2.5deg; --tape: -6deg; }
+.card:nth-child(3) { --r: -1.5deg; --tape: 2deg; }
+.card:nth-child(4) { --r: 3deg; --tape: -3deg; }
+.card:nth-child(5) { --r: -2deg; --tape: 5deg; }
+.card:hover {
+  transform: rotate(0deg) scale(1.28);
+  box-shadow: 0 24px 50px rgba(43, 37, 30, 0.3);
+  z-index: 5;
+}
+.card .e {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  margin-bottom: 8px;
+  background: #ece6d8;
+}
+.card .e img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.card h3 {
+  font-family: "Caveat", cursive;
+  font-size: 1.35rem;
+  margin: 0 2px 2px;
+}
+.card p {
+  font-size: 0.82rem;
+  line-height: 1.3;
+  margin: 0 2px;
+  color: var(--muted);
+}
+.card-credit {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  font: 500 0.55rem "Manrope", sans-serif;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 2px 6px;
+  border-radius: 999px;
+  text-decoration: none;
+}
+
+/* ---------- Чипы ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+.chip {
+  font: 700 0.95rem "Manrope", sans-serif;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  background: var(--paper-2);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.chip.on {
+  border-color: var(--red);
+  background: #fde8eb;
+  transform: scale(1.04) rotate(-1deg);
+}
+.wish {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: "Caveat", cursive;
+  font-size: 1.2rem;
+  color: var(--muted);
+}
+.wish input {
+  font: 600 1rem "Manrope", sans-serif;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--line);
+  background: #fff;
+  outline: none;
+}
+.wish input:focus {
+  border-color: var(--blue);
+}
+
+/* ---------- Талон ---------- */
+.ticket {
+  position: relative;
+  width: 100%;
+  background: #fff;
+  border-radius: 10px;
+  text-align: left;
+  box-shadow: 0 16px 36px rgba(11, 61, 145, 0.16);
+  animation: slide-fwd 0.6s ease both;
+}
+/* «Вырезы» по бокам на линии отрыва */
+.ticket-stub::before,
+.ticket-stub::after {
+  content: "";
+  position: absolute;
+  top: -12px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--paper);
+}
+.ticket-stub::before {
+  left: -11px;
+}
+.ticket-stub::after {
+  right: -11px;
+}
+.ticket-head {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: var(--blue);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  border-radius: 10px 10px 0 0;
+}
+.ticket-route {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px;
+}
+.ticket-route small,
+.ticket-grid small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.ticket-route strong {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.ticket-route .right {
+  text-align: right;
+}
+.plane-line {
+  flex: 1;
+  margin: 0 14px;
+  border-top: 2px dashed var(--line);
+  position: relative;
+}
+.plane-line svg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  transform: translate(-50%, -50%) rotate(90deg);
+  fill: var(--red);
+  background: #fff;
+}
+.ticket-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 18px;
+  padding: 0 18px 18px;
+}
+.ticket-grid b {
+  font-size: 1rem;
+  font-weight: 800;
+}
+.ticket-stub {
+  position: relative;
+  border-top: 2px dashed var(--line);
+  padding: 14px 18px 18px;
+}
+.ticket-stub small {
+  font-family: "Caveat", cursive;
+  font-size: 1.1rem;
+  color: var(--ink);
+}
+.barcode {
+  height: 44px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--ink) 0 2px,
+    transparent 2px 4px,
+    var(--ink) 4px 7px,
+    transparent 7px 9px,
+    var(--ink) 9px 10px,
+    transparent 10px 13px
+  );
+  border-radius: 3px;
+  margin-bottom: 8px;
+}
+/* Концертный билет */
+.ticket.concert {
+  background: #14162b;
+  color: #fff;
+  box-shadow: 0 18px 40px rgba(20, 22, 43, 0.35);
+}
+.ticket.concert .ticket-head {
+  background: #1f6fff;
+  letter-spacing: 0.08em;
+}
+.concert-main {
+  padding: 22px 18px 14px;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(31, 111, 255, 0.45), transparent 45%),
+    radial-gradient(circle at 10% 90%, rgba(200, 16, 46, 0.35), transparent 40%);
+}
+.concert-artist {
+  font-size: 4.2rem;
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: 0.06em;
+  background: linear-gradient(90deg, #ffffff, #9cc4ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.concert-sub {
+  margin-top: 8px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #9cc4ff;
+}
+.concert-when {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-family: "Caveat", cursive;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+.ticket.concert .ticket-grid small {
+  color: #8f95b8;
+}
+.ticket.concert .ticket-stub {
+  border-top-color: #2b2f4d;
+}
+.ticket.concert .ticket-stub small {
+  color: #dfe5ff;
+}
+.ticket.concert .barcode {
+  background: repeating-linear-gradient(
+    90deg,
+    #fff 0 2px,
+    transparent 2px 4px,
+    #fff 4px 7px,
+    transparent 7px 9px,
+    #fff 9px 10px,
+    transparent 10px 13px
+  );
+}
+.ticket.concert .stamp {
+  color: #ff5a6e;
+  border-color: #ff5a6e;
+  mix-blend-mode: normal;
+  top: 72px;
+}
+
+/* Финал */
+.final-choice {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 520px;
+  margin-top: 6px;
+}
+.final-choice .btn {
+  flex: 1;
+  white-space: nowrap;
+}
+.final-choice[hidden] {
+  display: none;
+}
+.result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 520px;
+  animation: slide-up 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.result[hidden] {
+  display: none;
+}
+.result-text {
+  font-family: "Caveat", cursive;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.stamp {
+  position: absolute;
+  right: 16px;
+  top: 58px;
+  padding: 6px 14px;
+  border: 3px solid var(--red);
+  border-radius: 8px;
+  color: var(--red);
+  font-weight: 800;
+  font-size: 1.3rem;
+  letter-spacing: 0.15em;
+  transform: rotate(-14deg);
+  opacity: 0;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+.stamp.show {
+  animation: stamp 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes stamp {
+  from {
+    opacity: 0;
+    transform: rotate(-14deg) scale(2.2);
+  }
+  to {
+    opacity: 0.85;
+  }
+}
+.actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ---------- ПК ---------- */
+@media (min-width: 760px) {
+  .app {
+    max-width: 860px;
+    padding: 32px 40px 48px;
+  }
+  .route {
+    margin: 0 60px 28px;
+  }
+  h1 {
+    font-size: 2.6rem;
+  }
+  h2 {
+    font-size: 2.1rem;
+  }
+  .story-text {
+    font-size: 1.1rem;
+    max-width: 40ch;
+  }
+  .screen {
+    gap: 18px;
+  }
+  .map-card {
+    max-width: 640px;
+  }
+  .question h1 {
+    margin-top: 8px;
+  }
+  /* фото слева, текст справа */
+  .screen.story.active {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    grid-template-areas:
+      "photo title"
+      "photo text"
+      "photo facts"
+      "photo choice";
+    column-gap: 44px;
+    row-gap: 16px;
+    align-content: center;
+    align-items: start;
+    justify-items: start;
+    text-align: left;
+  }
+  .screen.story .polaroid-main {
+    grid-area: photo;
+    width: 100%;
+    align-self: center;
+    margin: 0;
+  }
+  .screen.story h2 {
+    grid-area: title;
+    align-self: end;
+  }
+  .screen.story .story-text {
+    grid-area: text;
+  }
+  .screen.story .facts {
+    grid-area: facts;
+    justify-content: flex-start;
+  }
+  .screen.story .choice {
+    grid-area: choice;
+    max-width: 360px;
+  }
+  .wall {
+    gap: 34px 28px;
+    padding: 24px 0 16px;
+  }
+  .card {
+    width: 220px;
+  }
+  .chips {
+    max-width: 640px;
+  }
+  .wish,
+  #s-chips .btn {
+    max-width: 640px;
+  }
+  .ticket,
+  #s-ticket .actions {
+    max-width: 520px;
+  }
+}
