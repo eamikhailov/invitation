@@ -22,7 +22,7 @@ window.INVITE = {
   //   3) откройте https://api.telegram.org/bot<token>/getUpdates и возьмите
   //      "chat":{"id":123456789} — это chatId.
   // Значения лежат в secrets.js (не в git); на GitHub Pages подставляются из секретов.
-  telegramBot: window.TG || { token: "", chatId: "" },,
+  telegramBot: window.TG || { token: "", chatId: "" },
 
   // Вариант 2 (запасной, если бот не настроен): открыть чат и вставить текст.
   // telegram — username без @, whatsapp — номер в формате 79991234567
